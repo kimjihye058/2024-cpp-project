@@ -49,7 +49,7 @@ int main() {
             if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 Vector2i mousePos = Mouse::getPosition(window);
                 if (buttonSprite.getGlobalBounds().contains(Vector2f(mousePos))) {
-                    cout << "버튼 클릭됨. 1분 카운트다운 시작." << endl;
+                    cout << "버튼이 클릭되었습니다.\n1분 카운트다운이 시작됩니다." << endl;
                     isClick = true;
                     clock.restart();  // 타이머 시작
                 }
@@ -62,6 +62,7 @@ int main() {
             if (elapsed.asSeconds() >= 60) {
                 cout << "1분이 경과되었습니다." << endl;
                 isClick = false;  // 카운트 종료
+                window.close();
             }
         }
 
