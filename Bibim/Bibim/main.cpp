@@ -27,11 +27,48 @@ int main() {
     }
 
     // 시작버튼 이미지 텍스처 로드
-    Texture buttonTexture;
-    if (!buttonTexture.loadFromFile("img/startBtn.png")) {
+    Texture startButtonTexture, beanSproutTexture, brackenTexture, carrotTexture, cucumberTexture, friedEggTexture, meatTexture, mushroomTexture, riceTexture, spanishTexture;
+    if (!startButtonTexture.loadFromFile("img/startBtn.png")) {
+        cout << "start 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!beanSproutTexture.loadFromFile("img/ingredient/beanSprouts.png")) {
+        cout << "콩나물 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!brackenTexture.loadFromFile("img/ingredient/bracken.png")) {
+        cout << "고사리 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!carrotTexture.loadFromFile("img/ingredient/carrot.png")) {
+        cout << "당근 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!cucumberTexture.loadFromFile("img/ingredient/cucumber.png")) {
+        cout << "오이 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!friedEggTexture.loadFromFile("img/ingredient/friedEgg.png")) {
+        cout << "계란 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!meatTexture.loadFromFile("img/ingredient/meat.png")) {
+        cout << "고기 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!mushroomTexture.loadFromFile("img/ingredient/mushroom.png")) {
+        cout << "버섯 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!riceTexture.loadFromFile("img/ingredient/rice.png")) {
+        cout << "밥 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!spanishTexture.loadFromFile("img/ingredient/spinach.png")) {
         cout << "버튼 이미지를 로드할 수 없습니다." << endl;
         return -1;
     }
+
 
     // 폰트 로드
     Font font;
@@ -55,7 +92,7 @@ int main() {
     gameBackgroundSprite.setTexture(gameBackgroundTexture);
 
     Sprite buttonSprite;
-    buttonSprite.setTexture(buttonTexture);
+    buttonSprite.setTexture(startButtonTexture);
     buttonSprite.setPosition(420, 667); // 버튼 위치 설정
 
     // 상태 관리 변수
