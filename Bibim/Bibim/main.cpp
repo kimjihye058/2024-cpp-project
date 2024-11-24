@@ -26,7 +26,7 @@ int main() {
         return -1;
     }
 
-    // 시작버튼 이미지 텍스처 로드
+    // 버튼 이미지 텍스처 로드
     Texture startButtonTexture, beanSproutTexture, brackenTexture, carrotTexture, cucumberTexture, friedEggTexture, meatTexture, mushroomTexture, riceTexture, spanishTexture;
     if (!startButtonTexture.loadFromFile("img/startBtn.png")) {
         cout << "start 버튼 이미지를 로드할 수 없습니다." << endl;
