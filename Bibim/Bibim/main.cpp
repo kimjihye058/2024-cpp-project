@@ -95,34 +95,34 @@ int main() {
     startButtonSprite.setPosition(420, 667);
 
     Sprite bowlSprite(bowlTexture);
-    bowlSprite.setPosition(433, 211);
+    bowlSprite.setPosition(353, 251);
 
     Sprite eggSprite(friedEggTexture);
-    eggSprite.setPosition(1004, 644);
+    eggSprite.setPosition(904, 644);
 
     Sprite cucumberSprite(cucumberTexture);
-    cucumberSprite.setPosition(1105, 472);
+    cucumberSprite.setPosition(1005, 472);
 
     Sprite beanSprite(beanSproutTexture);
-    beanSprite.setPosition(1125, 277);
+    beanSprite.setPosition(1025, 237);
 
     Sprite mushroomSprite(mushroomTexture);
-    mushroomSprite.setPosition(931, 99);
+    mushroomSprite.setPosition(831, 99);
 
     Sprite brackenSprite(brackenTexture);
-    brackenSprite.setPosition(671, 61);
+    brackenSprite.setPosition(571, 40);
 
     Sprite meatSprite(meatTexture);
-    meatSprite.setPosition(398, 78);
+    meatSprite.setPosition(298, 78);
 
     Sprite carrotSprite(carrotTexture);
-    carrotSprite.setPosition(181, 242);
+    carrotSprite.setPosition(81, 212);
 
     Sprite spinachSprite(spinachTexture);
-    spinachSprite.setPosition(172, 452);
+    spinachSprite.setPosition(72, 452);
 
     Sprite riceSprite(riceTexture);
-    riceSprite.setPosition(266, 665);
+    riceSprite.setPosition(166, 665);
 
     // 상태 관리 변수
     Scene currentScene = Scene::StartScreen;
