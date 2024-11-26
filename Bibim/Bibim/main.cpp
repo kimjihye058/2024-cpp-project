@@ -3,20 +3,23 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <vector> // 그릇에 담긴 재료 관리를 위한 벡터
+#include <vector>
+#include <map> // 재료와 개수 관리를 위한 맵
+#include <cstdlib> // 랜덤 숫자 생성
+#include <ctime>
 
 using namespace std;
 using namespace sf;
 
-enum class Scene { StartScreen, GameScreen, BiBimScreen, EndingScreen }; // 화면 상태를 나타내는 열거형
+enum class Scene { StartScreen, GameScreen, BiBimScreen, EndingScreen };
 
 int main() {
+    srand(static_cast<unsigned int>(time(nullptr))); // 랜덤 시드 설정
+
     cout << "프로그램이 시작되었습니다." << endl;
 
-    // 창 생성
     RenderWindow window(VideoMode(1440, 1024), "bibim period");
 
-    // 배경 이미지 텍스처 로드
     Texture startBackgroundTexture, gameBackgroundTexture;
     if (!startBackgroundTexture.loadFromFile("img/startBg.png")) {
         cout << "시작 화면 배경 이미지를 로드할 수 없습니다." << endl;
@@ -27,7 +30,6 @@ int main() {
         return -1;
     }
 
-    // 버튼 및 재료 텍스처 로드
     Texture startButtonTexture, bowlTexture, beanSproutTexture, brackenTexture, carrotTexture, cucumberTexture, friedEggTexture, meatTexture, mushroomTexture, riceTexture, spinachTexture;
     if (!startButtonTexture.loadFromFile("img/startBtn.png")) {
         cout << "start 버튼 이미지를 로드할 수 없습니다." << endl;
@@ -74,21 +76,18 @@ int main() {
         return -1;
     }
 
-    // 폰트 로드
     Font font;
     if (!font.loadFromFile("font/Pretendard-Regular.otf")) {
         cout << "폰트를 로드할 수 없습니다." << endl;
         return -1;
     }
 
-    // 텍스트 설정
     Text timerText;
     timerText.setFont(font);
     timerText.setCharacterSize(50);
     timerText.setFillColor(Color::White);
     timerText.setPosition(20, 20);
 
-    // 스프라이트 설정
     Sprite startBackgroundSprite(startBackgroundTexture);
     Sprite gameBackgroundSprite(gameBackgroundTexture);
     Sprite startButtonSprite(startButtonTexture);
@@ -97,41 +96,33 @@ int main() {
     Sprite bowlSprite(bowlTexture);
     bowlSprite.setPosition(353, 251);
 
-    Sprite eggSprite(friedEggTexture);
-    eggSprite.setPosition(904, 644);
+    map<string, pair<Sprite, int>> ingredients = {
+        {"egg", {Sprite(friedEggTexture), rand() % 5 + 1}},
+        {"cucumber", {Sprite(cucumberTexture), rand() % 5 + 1}},
+        {"bean", {Sprite(beanSproutTexture), rand() % 5 + 1}},
+        {"mushroom", {Sprite(mushroomTexture), rand() % 5 + 1}},
+        {"bracken", {Sprite(brackenTexture), rand() % 5 + 1}},
+        {"meat", {Sprite(meatTexture), rand() % 5 + 1}},
+        {"carrot", {Sprite(carrotTexture), rand() % 5 + 1}},
+        {"spinach", {Sprite(spinachTexture), rand() % 5 + 1}},
+        {"rice", {Sprite(riceTexture), rand() % 5 + 1}},
+    };
 
-    Sprite cucumberSprite(cucumberTexture);
-    cucumberSprite.setPosition(1005, 472);
+    vector<pair<float, float>> positions = {
+        {904, 644}, {1005, 472}, {1025, 237}, {831, 99}, {571, 40},
+        {298, 78}, {81, 212}, {72, 452}, {166, 665}
+    };
 
-    Sprite beanSprite(beanSproutTexture);
-    beanSprite.setPosition(1025, 237);
+    int index = 0;
+    for (auto& ingredient : ingredients) {
+        ingredient.second.first.setPosition(positions[index].first, positions[index].second);
+        index++;
+    }
 
-    Sprite mushroomSprite(mushroomTexture);
-    mushroomSprite.setPosition(831, 99);
-
-    Sprite brackenSprite(brackenTexture);
-    brackenSprite.setPosition(571, 40);
-
-    Sprite meatSprite(meatTexture);
-    meatSprite.setPosition(298, 78);
-
-    Sprite carrotSprite(carrotTexture);
-    carrotSprite.setPosition(81, 212);
-
-    Sprite spinachSprite(spinachTexture);
-    spinachSprite.setPosition(72, 452);
-
-    Sprite riceSprite(riceTexture);
-    riceSprite.setPosition(166, 665);
-
-    // 상태 관리 변수
     Scene currentScene = Scene::StartScreen;
     bool isTimerRunning = false;
     Clock clock;
 
-    vector<Sprite> ingredientsInBowl; // 그릇에 담긴 재료를 관리하는 벡터
-
-    // 메인 루프
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
@@ -154,65 +145,32 @@ int main() {
                 Vector2i mousePos = Mouse::getPosition(window);
                 Vector2f mousePosF(mousePos.x, mousePos.y);
 
-                // 각 재료의 클릭 여부 확인
-                if (eggSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "계란이 선택되었습니다." << endl;
-                    Sprite addedIngredient(eggSprite);
-                    addedIngredient.setPosition(635, 485);
-                    ingredientsInBowl.push_back(addedIngredient);
+                for (auto& ingredient : ingredients) {
+                    if (ingredient.second.second > 0 && ingredient.second.first.getGlobalBounds().contains(mousePosF)) {
+                        cout << ingredient.first << "이(가) 선택되었습니다." << endl;
+                        ingredient.second.second--;
+                        if (ingredient.second.second == 0) {
+                            cout << ingredient.first << "이(가) 모두 소진되었습니다." << endl;
+                        }
+                        break;
+                    }
                 }
-                else if (cucumberSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "오이가 선택되었습니다." << endl;
-                    Sprite addedIngredient(cucumberSprite);
-                    addedIngredient.setPosition(720, 552);
-                    ingredientsInBowl.push_back(addedIngredient);
+
+                bool allDepleted = true;
+                for (const auto& ingredient : ingredients) {
+                    if (ingredient.second.second > 0) {
+                        allDepleted = false;
+                        break;
+                    }
                 }
-                else if (beanSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "콩나물이 선택되었습니다." << endl;
-                    Sprite addedIngredient(beanSprite);
-                    addedIngredient.setPosition(823, 457);
-                    ingredientsInBowl.push_back(addedIngredient);
-                }
-                else if (mushroomSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "버섯이 선택되었습니다." << endl;
-                    Sprite addedIngredient(mushroomSprite);
-                    addedIngredient.setPosition(758, 342);
-                    ingredientsInBowl.push_back(addedIngredient);
-                }
-                else if (brackenSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "고사리가 선택되었습니다." << endl;
-                    Sprite addedIngredient(brackenSprite);
-                    addedIngredient.setPosition(635, 304);
-                    ingredientsInBowl.push_back(addedIngredient);
-                }
-                else if (meatSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "고기가 선택되었습니다." << endl;
-                    Sprite addedIngredient(meatSprite);
-                    addedIngredient.setPosition(529, 326);
-                    ingredientsInBowl.push_back(addedIngredient);
-                }
-                else if (carrotSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "당근이 선택되었습니다." << endl;
-                    Sprite addedIngredient(carrotSprite);
-                    addedIngredient.setPosition(507, 381);
-                    ingredientsInBowl.push_back(addedIngredient);
-                }
-                else if (spinachSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "시금치가 선택되었습니다." << endl;
-                    Sprite addedIngredient(spinachSprite);
-                    addedIngredient.setPosition(496, 465);
-                    ingredientsInBowl.push_back(addedIngredient);
-                }
-                else if (riceSprite.getGlobalBounds().contains(mousePosF)) {
-                    cout << "밥이 선택되었습니다." << endl;
-                    Sprite addedIngredient(riceSprite);
-                    addedIngredient.setPosition(545, 567);
-                    ingredientsInBowl.push_back(addedIngredient);
+
+                if (allDepleted) {
+                    cout << "모든 재료가 소진되었습니다. 다음 화면으로 전환됩니다." << endl;
+                    currentScene = Scene::BiBimScreen;
                 }
             }
         }
 
-        // 타이머 업데이트
         if (isTimerRunning) {
             Time elapsed = clock.getElapsedTime();
             int remainingTime = 60 - static_cast<int>(elapsed.asSeconds());
@@ -231,7 +189,6 @@ int main() {
             }
         }
 
-        // 화면 지우기
         window.clear();
 
         if (currentScene == Scene::StartScreen) {
@@ -243,19 +200,16 @@ int main() {
             window.draw(gameBackgroundSprite);
             window.draw(timerText);
             window.draw(bowlSprite);
-            window.draw(eggSprite);
-            window.draw(cucumberSprite);
-            window.draw(beanSprite);
-            window.draw(mushroomSprite);
-            window.draw(brackenSprite);
-            window.draw(meatSprite);
-            window.draw(carrotSprite);
-            window.draw(spinachSprite);
-            window.draw(riceSprite);
 
-            for (const auto& ingredient : ingredientsInBowl) {
-                window.draw(ingredient);
+            for (const auto& ingredient : ingredients) {
+                if (ingredient.second.second > 0) {
+                    window.draw(ingredient.second.first);
+                }
             }
+        }
+        else if (currentScene == Scene::BiBimScreen) {
+            window.draw(gameBackgroundSprite);
+            window.draw(timerText);
         }
 
         window.display();
