@@ -3,9 +3,8 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <vector>
-#include <map> // 재료와 개수 관리를 위한 맵
-#include <cstdlib> // 랜덤 숫자 생성
+#include <map>
+#include <cstdlib>
 #include <ctime>
 
 using namespace std;
@@ -96,27 +95,21 @@ int main() {
     Sprite bowlSprite(bowlTexture);
     bowlSprite.setPosition(353, 251);
 
-    map<string, pair<Sprite, int>> ingredients = {
-        {"egg", {Sprite(friedEggTexture), rand() % 5 + 1}},
-        {"cucumber", {Sprite(cucumberTexture), rand() % 5 + 1}},
-        {"bean", {Sprite(beanSproutTexture), rand() % 5 + 1}},
-        {"mushroom", {Sprite(mushroomTexture), rand() % 5 + 1}},
-        {"bracken", {Sprite(brackenTexture), rand() % 5 + 1}},
-        {"meat", {Sprite(meatTexture), rand() % 5 + 1}},
-        {"carrot", {Sprite(carrotTexture), rand() % 5 + 1}},
-        {"spinach", {Sprite(spinachTexture), rand() % 5 + 1}},
-        {"rice", {Sprite(riceTexture), rand() % 5 + 1}},
+    map<string, tuple<Sprite, int, Vector2f, Vector2f>> ingredients = {
+        {"egg", {Sprite(friedEggTexture), rand() % 5 + 1, {904, 644}, {621, 414}}},
+        {"cucumber", {Sprite(cucumberTexture), rand() % 5 + 1, {1005, 472}, {742, 567}}},
+        {"bean", {Sprite(beanSproutTexture), rand() % 5 + 1, {1025, 237}, {823, 482}}},
+        {"mushroom", {Sprite(mushroomTexture), rand() % 5 + 1, {831, 99}, {791, 381}}},
+        {"bracken", {Sprite(brackenTexture), rand() % 5 + 1, {571, 40}, {613, 335}}},
+        {"meat", {Sprite(meatTexture), rand() % 5 + 1, {298, 78}, {496, 397}}},
+        {"carrot", {Sprite(carrotTexture), rand() % 5 + 1, {81, 212}, {460, 491}}},
+        {"spinach", {Sprite(spinachTexture), rand() % 5 + 1, {72, 452}, {538, 544}}},
+        {"rice", {Sprite(riceTexture), rand() % 5 + 1, {166, 665}, {645, 497}}}
     };
 
-    vector<pair<float, float>> positions = {
-        {904, 644}, {1005, 472}, {1025, 237}, {831, 99}, {571, 40},
-        {298, 78}, {81, 212}, {72, 452}, {166, 665}
-    };
-
-    int index = 0;
     for (auto& ingredient : ingredients) {
-        ingredient.second.first.setPosition(positions[index].first, positions[index].second);
-        index++;
+        auto& [sprite, count, startPos, targetPos] = ingredient.second;
+        sprite.setPosition(startPos);
     }
 
     Scene currentScene = Scene::StartScreen;
@@ -146,11 +139,18 @@ int main() {
                 Vector2f mousePosF(mousePos.x, mousePos.y);
 
                 for (auto& ingredient : ingredients) {
-                    if (ingredient.second.second > 0 && ingredient.second.first.getGlobalBounds().contains(mousePosF)) {
+                    auto& [sprite, count, startPos, targetPos] = ingredient.second;
+
+                    if (count > 0 && sprite.getGlobalBounds().contains(mousePosF)) {
                         cout << ingredient.first << "이(가) 선택되었습니다." << endl;
-                        ingredient.second.second--;
-                        if (ingredient.second.second == 0) {
-                            cout << ingredient.first << "이(가) 모두 소진되었습니다." << endl;
+                        count--;
+
+                        if (count == 0) {
+                            sprite.setPosition(targetPos);
+                            cout << ingredient.first << "이(가) 마지막입니다. 지정된 위치로 이동합니다." << endl;
+                        }
+                        else {
+                            cout << ingredient.first << "이(가) " << count << "개 남았습니다." << endl;
                         }
                         break;
                     }
@@ -158,7 +158,7 @@ int main() {
 
                 bool allDepleted = true;
                 for (const auto& ingredient : ingredients) {
-                    if (ingredient.second.second > 0) {
+                    if (get<1>(ingredient.second) > 0) {
                         allDepleted = false;
                         break;
                     }
@@ -202,14 +202,8 @@ int main() {
             window.draw(bowlSprite);
 
             for (const auto& ingredient : ingredients) {
-                if (ingredient.second.second > 0) {
-                    window.draw(ingredient.second.first);
-                }
+                window.draw(get<0>(ingredient.second));
             }
-        }
-        else if (currentScene == Scene::BiBimScreen) {
-            window.draw(gameBackgroundSprite);
-            window.draw(timerText);
         }
 
         window.display();
