@@ -38,7 +38,9 @@ int main() {
         return -1; // 오류 종료
     }
 
-    Texture startButtonTexture, bowlTexture, beanSproutTexture, brackenTexture, carrotTexture, cucumberTexture, friedEggTexture, meatTexture, mushroomTexture, riceTexture, spinachTexture;
+    Texture startButtonTexture, bowlTexture,
+        beanSproutTexture, brackenTexture, carrotTexture, cucumberTexture, friedEggTexture, meatTexture, mushroomTexture, riceTexture, spinachTexture,
+        bibimbabTexture, gochujangTexture;
     if (!startButtonTexture.loadFromFile("img/startBtn.png")) {
         cout << "start 버튼 이미지를 로드할 수 없습니다." << endl;
         return -1;
@@ -83,6 +85,14 @@ int main() {
         cout << "시금치 버튼 이미지를 로드할 수 없습니다." << endl;
         return -1;
     }
+    if (!bibimbabTexture.loadFromFile("img/bibimbab.png")) {
+        cout << "비빔밥 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!gochujangTexture.loadFromFile("img/gochujang.png")) {
+        cout << "고추장 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
 
     Font font;
     if (!font.loadFromFile("font/Pretendard-Regular.otf")) {
@@ -103,6 +113,12 @@ int main() {
 
     Sprite bowlSprite(bowlTexture);
     bowlSprite.setPosition(353, 251);
+
+    Sprite bibimbabSprite(bibimbabTexture);
+    bibimbabSprite.setPosition(35, 16);
+
+    Sprite gochujangSprite(gochujangTexture);
+    gochujangSprite.setPosition(903, 256);
 
     map<string, tuple<Sprite, int, Vector2f, Vector2f>> ingredients = {
         {"egg", {Sprite(friedEggTexture), rand() % 5 + 1, {904, 644}, {621, 414}}},
@@ -142,7 +158,7 @@ int main() {
                     clock.restart();
 
                     // 음악 재생
-                    backgroundMusic.play(); // 버튼이 눌렸을 때 음악 재생
+                    backgroundMusic.play();
                 }
             }
 
@@ -190,9 +206,11 @@ int main() {
             if (remainingTime <= 0) {
                 cout << "1분이 경과되었습니다." << endl;
                 isTimerRunning = false;
+                window.close();
                 timerText.setString("00:00");
             }
             else {
+                // 남은 시간을 문자열로 변환
                 int minutes = remainingTime / 60;
                 int seconds = remainingTime % 60;
                 stringstream ss;
@@ -201,12 +219,11 @@ int main() {
             }
         }
 
-        window.clear();
 
+        window.clear();
         if (currentScene == Scene::StartScreen) {
             window.draw(startBackgroundSprite);
             window.draw(startButtonSprite);
-            window.draw(timerText);
         }
         else if (currentScene == Scene::GameScreen) {
             window.draw(gameBackgroundSprite);
@@ -214,8 +231,21 @@ int main() {
             window.draw(bowlSprite);
 
             for (const auto& ingredient : ingredients) {
-                window.draw(get<0>(ingredient.second));
+                if (ingredient.first != "gochujang") { // GameScreen에서 고추장 제외
+                    window.draw(get<0>(ingredient.second));
+                }
             }
+        }
+        else if (currentScene == Scene::BiBimScreen) {
+            window.draw(gameBackgroundSprite);
+            window.draw(timerText);
+            window.draw(bibimbabSprite);
+
+            window.draw(gochujangSprite); // BiBimScreen에서만 고추장 표시
+        }
+        else if (currentScene == Scene::EndingScreen) {
+            cout << "엔딩 화면입니다. 프로그램을 종료합니다." << endl;
+            window.close();
         }
 
         window.display();
