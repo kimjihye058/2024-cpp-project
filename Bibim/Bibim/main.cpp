@@ -1,5 +1,6 @@
 ﻿#include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -19,6 +20,8 @@ int main() {
 
     RenderWindow window(VideoMode(1440, 1024), "bibim period");
 
+    Music backgroundMusic; // 음악 객체 생성
+
     Texture startBackgroundTexture, gameBackgroundTexture;
     if (!startBackgroundTexture.loadFromFile("img/startBg.png")) {
         cout << "시작 화면 배경 이미지를 로드할 수 없습니다." << endl;
@@ -27,6 +30,12 @@ int main() {
     if (!gameBackgroundTexture.loadFromFile("img/IngredientBg.png")) {
         cout << "게임 화면 배경 이미지를 로드할 수 없습니다." << endl;
         return -1;
+    }
+
+    // 음악 파일 로드
+    if (!backgroundMusic.openFromFile("bibim.ogg")) {
+        std::cerr << "음악 파일을 로드할 수 없습니다!" << std::endl;
+        return -1; // 오류 종료
     }
 
     Texture startButtonTexture, bowlTexture, beanSproutTexture, brackenTexture, carrotTexture, cucumberTexture, friedEggTexture, meatTexture, mushroomTexture, riceTexture, spinachTexture;
@@ -131,6 +140,9 @@ int main() {
                     currentScene = Scene::GameScreen;
                     isTimerRunning = true;
                     clock.restart();
+
+                    // 음악 재생
+                    backgroundMusic.play(); // 버튼이 눌렸을 때 음악 재생
                 }
             }
 
