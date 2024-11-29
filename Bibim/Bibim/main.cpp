@@ -106,6 +106,15 @@ int main() {
     timerText.setFillColor(Color::White);
     timerText.setPosition(20, 20);
 
+    Text gamemessage;
+    gamemessage.setFont(font);
+    gamemessage.setCharacterSize(50);
+    gamemessage.setString(L"Bibim 재료를 모두 넣어주세요.");
+    gamemessage.setCharacterSize(40);
+    gamemessage.setFillColor(Color::White);
+    FloatRect textBounds = gamemessage.getGlobalBounds();
+    gamemessage.setPosition((1440 - textBounds.width) / 2, 1024 - textBounds.height - 50);
+
     Sprite startBackgroundSprite(startBackgroundTexture);
     Sprite gameBackgroundSprite(gameBackgroundTexture);
     Sprite startButtonSprite(startButtonTexture);
@@ -229,12 +238,13 @@ int main() {
             window.draw(gameBackgroundSprite);
             window.draw(timerText);
             window.draw(bowlSprite);
-
             for (const auto& ingredient : ingredients) {
                 if (ingredient.first != "gochujang") { // GameScreen에서 고추장 제외
                     window.draw(get<0>(ingredient.second));
                 }
             }
+            window.draw(gamemessage);
+
         }
         else if (currentScene == Scene::BiBimScreen) {
             window.draw(gameBackgroundSprite);
