@@ -13,7 +13,7 @@
 using namespace std;
 using namespace sf;
 
-enum class Scene { StartScreen, GameScreen, BiBimScreen, MixScreen,EndingScreen };
+enum class Scene { StartScreen, GameScreen, BiBimScreen, MixScreen, EndingScreen, PassScreen, OverScreen };
 
 void initializeText(Text& text, const Font& font, const wstring& content, int size, const Vector2f& position) {
     text.setFont(font);
@@ -23,6 +23,10 @@ void initializeText(Text& text, const Font& font, const wstring& content, int si
     FloatRect bounds = text.getGlobalBounds();
     text.setPosition(position.x - bounds.width / 2, position.y - bounds.height / 2);
 }
+
+int mixCount = 0;
+const int MAX_MIX_COUNT = 100;
+RectangleShape mixGauge, mixGaugeBackground;
 
 int main() {
 
@@ -34,7 +38,7 @@ int main() {
 
     Music backgroundMusic; // 음악 객체 생성
 
-    Texture startBackgroundTexture, gameBackgroundTexture, mixBackgroundTexture;
+    Texture startBackgroundTexture, gameBackgroundTexture, mixBackgroundTexture, passBackgroundTexture, overBackgrountTexture;
     if (!startBackgroundTexture.loadFromFile("img/startBg.png")) {
         cout << "시작 화면 배경 이미지를 로드할 수 없습니다." << endl;
         return -1;
@@ -45,6 +49,14 @@ int main() {
     }
     if (!mixBackgroundTexture.loadFromFile("img/mixBg.png")) {
         cout << "비빔밥 섞기 화면 배경 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!passBackgroundTexture.loadFromFile("img/passBg.png")) {
+        cout << "패스 배경 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!overBackgrountTexture.loadFromFile("img/overBg.png")) {
+        cout << "오버 배경 이미지를 로드할 수 없습니다." << endl;
         return -1;
     }
 
@@ -140,6 +152,10 @@ int main() {
     Sprite startBackgroundSprite(startBackgroundTexture);
     Sprite gameBackgroundSprite(gameBackgroundTexture);
     Sprite mixBackgroundSprite(mixBackgroundTexture);
+    Sprite passBackgroundSprite(passBackgroundTexture);
+    Sprite overBackgrountSprite(overBackgrountTexture);
+
+
     Sprite startButtonSprite(startButtonTexture);
     startButtonSprite.setPosition(420, 667);
 
@@ -160,6 +176,16 @@ int main() {
     Vector2f sauceStartPosition; // 소스 시작 위치
     Vector2f sauceTargetPosition = bibimbabSprite.getPosition(); // 비빔밥 위치
     Clock sauceClock; // 소스 이동 타이머
+
+    // 믹싱 게이지 설정
+    mixGaugeBackground.setSize(Vector2f(800, 30));
+    mixGaugeBackground.setPosition(320, 700);
+    mixGaugeBackground.setFillColor(Color(100, 100, 100));
+
+    mixGauge.setSize(Vector2f(0, 30));
+    mixGauge.setPosition(320, 700);
+    mixGauge.setFillColor(Color::Red);
+
 
     map<string, tuple<Sprite, int, Vector2f, Vector2f>> ingredients = {
         {"egg", {Sprite(friedEggTexture), rand() % 5 + 1, {904, 644}, {621, 414}}},
@@ -262,18 +288,26 @@ int main() {
             if (isSauceMoving) {
                 float elapsedTime = sauceClock.getElapsedTime().asSeconds();
 
-                if (elapsedTime >= 1.0f) { // 비빔밥 위치에 도달한 후 1초 지나면
-                    currentScene = Scene::MixScreen;
-                    isSauceMoving = false;
+                if (elapsedTime > 0.5f) {
+                    currentScene = Scene::MixScreen;  // MixScreen으로 장면 전환
+                    isSauceMoving = false;  // 소스 이동 상태를 종료
                 }
             }
 
             // MixScreen event handling (for mixing the bibimbap)
             if (currentScene == Scene::MixScreen && event.type == Event::KeyPressed && event.key.code == Keyboard::Space) {
-                cout << "비빔밥을 비벼주세요!" << endl;
-                // You can add a mixing animation or gameplay mechanic here
-                currentScene = Scene::EndingScreen; // After mixing, go to the ending screen
+                mixCount++;
+
+                // 게이지 크기 조정 (800픽셀을 100번 누르면 전체 차도록)
+                float gaugeWidth = (mixCount / static_cast<float>(MAX_MIX_COUNT)) * 800;
+                mixGauge.setSize(Vector2f(gaugeWidth, 30));
+
+                if (mixCount >= MAX_MIX_COUNT) {
+                    currentScene = Scene::EndingScreen;
+                }
             }
+
+
         }
 
         if (isTimerRunning) {
@@ -293,6 +327,11 @@ int main() {
                 stringstream ss;
                 ss << setw(2) << setfill('0') << minutes << ":" << setw(2) << setfill('0') << seconds;
                 timerText.setString(ss.str());
+
+                // 시간이 남아있다면 패스 화면으로 전환
+                if (remainingTime > 0 && currentScene == Scene::EndingScreen) {
+                    currentScene = Scene::PassScreen;
+                }
             }
         }
 
@@ -328,13 +367,28 @@ int main() {
             window.draw(mixBackgroundSprite);
             window.draw(timerText);
             window.draw(mixmessage);
+            window.draw(mixGaugeBackground);
+            window.draw(mixGauge);
             break;
 
         case Scene::EndingScreen:
             window.draw(timerText);
             break;
+        
+        case Scene::PassScreen:
+            window.draw(passBackgroundSprite);
+            window.draw(timerText);
+            timerText.setPosition(600, 187); // 시간 텍스트 위치 조정
+            break;
+
+        case Scene::OverScreen:
+            window.draw(overBackgrountSprite);
+            window.draw(timerText);
+            timerText.setPosition(600, 187); // 시간 텍스트 위치 조정
+            break;
         }
 
+        
         window.display();
     }
 

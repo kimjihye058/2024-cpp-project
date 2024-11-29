@@ -1,40 +1,40 @@
 ﻿  main.cpp
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244: '인수': 'T'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244:         with
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244:         [
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244:             T=int
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244:         ]
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244:         and
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244:         [
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244:             T=float
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,56): warning C4244:         ]
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244: '인수': 'T'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244:         with
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244:         [
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244:             T=int
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244:         ]
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244:         and
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244:         [
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244:             T=float
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(212,44): warning C4244:         ]
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244: '인수': 'T'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244:         with
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244:         [
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244:             T=int
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244:         ]
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244:         and
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244:         [
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244:             T=float
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,56): warning C4244:         ]
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244: '인수': 'T'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244:         with
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244:         [
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244:             T=int
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244:         ]
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244:         and
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244:         [
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244:             T=float
-C:\2024-cpp-project\Bibim\Bibim\main.cpp(249,44): warning C4244:         ]
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244: '인수': 'T'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244:         with
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244:         [
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244:             T=int
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244:         ]
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244:         and
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244:         [
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244:             T=float
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,56): warning C4244:         ]
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244: '인수': 'T'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244:         with
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244:         [
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244:             T=int
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244:         ]
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244:         and
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244:         [
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244:             T=float
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(238,44): warning C4244:         ]
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244: '인수': 'T'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244:         with
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244:         [
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244:             T=int
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244:         ]
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244:         and
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244:         [
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244:             T=float
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,56): warning C4244:         ]
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244: '인수': 'T'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244:         with
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244:         [
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244:             T=int
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244:         ]
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244:         and
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244:         [
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244:             T=float
+C:\2024-cpp-project\Bibim\Bibim\main.cpp(275,44): warning C4244:         ]
   Bibim.vcxproj -> C:\2024-cpp-project\Bibim\x64\Debug\Bibim.exe
   'pwsh.exe'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
   배치 파일이 아닙니다.
