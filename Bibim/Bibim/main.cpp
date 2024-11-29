@@ -7,13 +7,25 @@
 #include <map>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
+
 
 using namespace std;
 using namespace sf;
 
-enum class Scene { StartScreen, GameScreen, BiBimScreen, EndingScreen };
+enum class Scene { StartScreen, GameScreen, BiBimScreen, MixScreen,EndingScreen };
+
+void initializeText(Text& text, const Font& font, const wstring& content, int size, const Vector2f& position) {
+    text.setFont(font);
+    text.setString(content);
+    text.setCharacterSize(size);
+    text.setFillColor(Color::White);
+    FloatRect bounds = text.getGlobalBounds();
+    text.setPosition(position.x - bounds.width / 2, position.y - bounds.height / 2);
+}
 
 int main() {
+
     srand(static_cast<unsigned int>(time(nullptr))); // 랜덤 시드 설정
 
     cout << "프로그램이 시작되었습니다." << endl;
@@ -22,13 +34,17 @@ int main() {
 
     Music backgroundMusic; // 음악 객체 생성
 
-    Texture startBackgroundTexture, gameBackgroundTexture;
+    Texture startBackgroundTexture, gameBackgroundTexture, mixBackgroundTexture;
     if (!startBackgroundTexture.loadFromFile("img/startBg.png")) {
         cout << "시작 화면 배경 이미지를 로드할 수 없습니다." << endl;
         return -1;
     }
     if (!gameBackgroundTexture.loadFromFile("img/IngredientBg.png")) {
         cout << "게임 화면 배경 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!mixBackgroundTexture.loadFromFile("img/mixBg.png")) {
+        cout << "비빔밥 섞기 화면 배경 이미지를 로드할 수 없습니다." << endl;
         return -1;
     }
 
@@ -40,7 +56,7 @@ int main() {
 
     Texture startButtonTexture, bowlTexture,
         beanSproutTexture, brackenTexture, carrotTexture, cucumberTexture, friedEggTexture, meatTexture, mushroomTexture, riceTexture, spinachTexture,
-        bibimbabTexture, gochujangTexture;
+        bibimbabTexture, gochujangTexture, sauceTexture;
     if (!startButtonTexture.loadFromFile("img/startBtn.png")) {
         cout << "start 버튼 이미지를 로드할 수 없습니다." << endl;
         return -1;
@@ -93,6 +109,10 @@ int main() {
         cout << "고추장 이미지를 로드할 수 없습니다." << endl;
         return -1;
     }
+    if (!sauceTexture.loadFromFile("img/sauce.png")) {
+        cout << "고추장 소스 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
 
     Font font;
     if (!font.loadFromFile("font/Pretendard-Regular.otf")) {
@@ -100,23 +120,26 @@ int main() {
         return -1;
     }
 
+    Text gamemessage;
+    initializeText(gamemessage, font, L"Bibim 재료를 모두 넣어주세요.", 40, { 720, 974 });
+
+    Text bibimmessage;
+    initializeText(bibimmessage, font, L"고추장을 넣어주세요.", 40, { 720, 974 });
+
+    Text mixmessage;
+    initializeText(mixmessage, font, L"[space]로 비벼주세요.", 40, { 720, 974 });
+
     Text timerText;
     timerText.setFont(font);
     timerText.setCharacterSize(50);
     timerText.setFillColor(Color::White);
     timerText.setPosition(20, 20);
 
-    Text gamemessage;
-    gamemessage.setFont(font);
-    gamemessage.setCharacterSize(50);
-    gamemessage.setString(L"Bibim 재료를 모두 넣어주세요.");
-    gamemessage.setCharacterSize(40);
-    gamemessage.setFillColor(Color::White);
-    FloatRect textBounds = gamemessage.getGlobalBounds();
-    gamemessage.setPosition((1440 - textBounds.width) / 2, 1024 - textBounds.height - 50);
+    
 
     Sprite startBackgroundSprite(startBackgroundTexture);
     Sprite gameBackgroundSprite(gameBackgroundTexture);
+    Sprite mixBackgroundSprite(mixBackgroundTexture);
     Sprite startButtonSprite(startButtonTexture);
     startButtonSprite.setPosition(420, 667);
 
@@ -128,6 +151,15 @@ int main() {
 
     Sprite gochujangSprite(gochujangTexture);
     gochujangSprite.setPosition(903, 256);
+
+    Sprite sauceSprite(sauceTexture);
+    sauceSprite.setPosition(998, 330);
+
+    // 애니메이션 상태 변수
+    bool isSauceMoving = false;
+    Vector2f sauceStartPosition; // 소스 시작 위치
+    Vector2f sauceTargetPosition = bibimbabSprite.getPosition(); // 비빔밥 위치
+    Clock sauceClock; // 소스 이동 타이머
 
     map<string, tuple<Sprite, int, Vector2f, Vector2f>> ingredients = {
         {"egg", {Sprite(friedEggTexture), rand() % 5 + 1, {904, 644}, {621, 414}}},
@@ -149,6 +181,8 @@ int main() {
     Scene currentScene = Scene::StartScreen;
     bool isTimerRunning = false;
     Clock clock;
+    Clock transitionClock;
+
 
     while (window.isOpen()) {
         Event event;
@@ -158,6 +192,7 @@ int main() {
                 cout << "프로그램이 종료되었습니다." << endl;
             }
 
+            // StartScreen 이벤트 처리
             if (currentScene == Scene::StartScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 Vector2i mousePos = Mouse::getPosition(window);
                 if (startButtonSprite.getGlobalBounds().contains(Vector2f(mousePos))) {
@@ -171,6 +206,7 @@ int main() {
                 }
             }
 
+            // GameScreen 이벤트 처리
             if (currentScene == Scene::GameScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 Vector2i mousePos = Mouse::getPosition(window);
                 Vector2f mousePosF(mousePos.x, mousePos.y);
@@ -206,6 +242,38 @@ int main() {
                     currentScene = Scene::BiBimScreen;
                 }
             }
+
+            // 비빔밥 씬에서의 이벤트 처리
+            if (currentScene == Scene::BiBimScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+                Vector2i mousePos = Mouse::getPosition(window);
+                Vector2f mousePosF(mousePos.x, mousePos.y);
+
+                // 고추장 클릭 이벤트 처리
+                if (sauceSprite.getGlobalBounds().contains(mousePosF)) {
+                    // 소스를 비빔밥 위치로 이동 (348, 384)
+                    sauceSprite.setPosition(348, 384);
+                    // 이전 위치 (998, 330)에서 비빔밥 위치로 이동했음을 표시
+                    isSauceMoving = true;
+                    sauceClock.restart();
+                }
+            }
+
+            // 소스 이동 처리
+            if (isSauceMoving) {
+                float elapsedTime = sauceClock.getElapsedTime().asSeconds();
+
+                if (elapsedTime >= 1.0f) { // 비빔밥 위치에 도달한 후 1초 지나면
+                    currentScene = Scene::MixScreen;
+                    isSauceMoving = false;
+                }
+            }
+
+            // MixScreen event handling (for mixing the bibimbap)
+            if (currentScene == Scene::MixScreen && event.type == Event::KeyPressed && event.key.code == Keyboard::Space) {
+                cout << "비빔밥을 비벼주세요!" << endl;
+                // You can add a mixing animation or gameplay mechanic here
+                currentScene = Scene::EndingScreen; // After mixing, go to the ending screen
+            }
         }
 
         if (isTimerRunning) {
@@ -230,32 +298,41 @@ int main() {
 
 
         window.clear();
-        if (currentScene == Scene::StartScreen) {
+        // Draw appropriate screen based on the current scene
+        switch (currentScene) {
+        case Scene::StartScreen:
             window.draw(startBackgroundSprite);
             window.draw(startButtonSprite);
-        }
-        else if (currentScene == Scene::GameScreen) {
+            break;
+
+        case Scene::GameScreen:
             window.draw(gameBackgroundSprite);
             window.draw(timerText);
             window.draw(bowlSprite);
-            for (const auto& ingredient : ingredients) {
-                if (ingredient.first != "gochujang") { // GameScreen에서 고추장 제외
-                    window.draw(get<0>(ingredient.second));
-                }
+            for (auto& ingredient : ingredients) {
+                window.draw(get<0>(ingredient.second)); // Draw each ingredient sprite
             }
             window.draw(gamemessage);
+            break;
 
-        }
-        else if (currentScene == Scene::BiBimScreen) {
+        case Scene::BiBimScreen:
             window.draw(gameBackgroundSprite);
             window.draw(timerText);
+            window.draw(gochujangSprite);
             window.draw(bibimbabSprite);
+            window.draw(sauceSprite);
+            window.draw(bibimmessage);
+            break;
 
-            window.draw(gochujangSprite); // BiBimScreen에서만 고추장 표시
-        }
-        else if (currentScene == Scene::EndingScreen) {
-            cout << "엔딩 화면입니다. 프로그램을 종료합니다." << endl;
-            window.close();
+        case Scene::MixScreen:
+            window.draw(mixBackgroundSprite);
+            window.draw(timerText);
+            window.draw(mixmessage);
+            break;
+
+        case Scene::EndingScreen:
+            window.draw(timerText);
+            break;
         }
 
         window.display();
