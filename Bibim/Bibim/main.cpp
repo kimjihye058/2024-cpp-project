@@ -66,11 +66,15 @@ int main() {
         return -1; // 오류 종료
     }
 
-    Texture startButtonTexture, bowlTexture,
+    Texture startButtonTexture, retryButtonTexture, bowlTexture,
         beanSproutTexture, brackenTexture, carrotTexture, cucumberTexture, friedEggTexture, meatTexture, mushroomTexture, riceTexture, spinachTexture,
         bibimbabTexture, gochujangTexture, sauceTexture;
     if (!startButtonTexture.loadFromFile("img/startBtn.png")) {
         cout << "start 버튼 이미지를 로드할 수 없습니다." << endl;
+        return -1;
+    }
+    if (!retryButtonTexture.loadFromFile("img/retryBtn.png")) {
+        cout << "retry 버튼 이미지를 로드할 수 없습니다." << endl;
         return -1;
     }
     if (!bowlTexture.loadFromFile("img/bowl.png")) {
@@ -158,6 +162,9 @@ int main() {
 
     Sprite startButtonSprite(startButtonTexture);
     startButtonSprite.setPosition(420, 667);
+
+    Sprite retryButtonSprite(retryButtonTexture);
+    retryButtonSprite.setPosition(20, 20);
 
     Sprite bowlSprite(bowlTexture);
     bowlSprite.setPosition(353, 251);
@@ -307,6 +314,14 @@ int main() {
                 }
             }
 
+            if (currentScene == Scene::OverScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+                Vector2i mousePos = Mouse::getPosition(window);
+                if (retryButtonSprite.getGlobalBounds().contains(Vector2f(mousePos))) {
+                    cout << "다시시작 버튼이 클릭되었습니다. start 화면으로 전환됩니다." << endl;
+                    currentScene = Scene::StartScreen;
+                    
+                }
+            }
 
         }
 
@@ -317,8 +332,9 @@ int main() {
             if (remainingTime <= 0) {
                 cout << "1분이 경과되었습니다." << endl;
                 isTimerRunning = false;
-                window.close();
                 timerText.setString("00:00");
+                currentScene = Scene::OverScreen;
+
             }
             else {
                 // 남은 시간을 문자열로 변환
@@ -330,8 +346,10 @@ int main() {
 
                 // 시간이 남아있다면 패스 화면으로 전환
                 if (remainingTime > 0 && currentScene == Scene::EndingScreen) {
+                    isTimerRunning = false;
                     currentScene = Scene::PassScreen;
                 }
+                
             }
         }
 
@@ -383,8 +401,7 @@ int main() {
 
         case Scene::OverScreen:
             window.draw(overBackgrountSprite);
-            window.draw(timerText);
-            timerText.setPosition(600, 187); // 시간 텍스트 위치 조정
+            window.draw(retryButtonSprite);
             break;
         }
 
