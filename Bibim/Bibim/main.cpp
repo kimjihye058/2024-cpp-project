@@ -125,9 +125,9 @@ int main() {
 
     // 텍스트 객체 생성 및 초기화
     Text gamemessage, bibimmessage, mixmessage, timerText;
-    initializeText(gamemessage, font, L"Bibim 재료를 모두 넣어주세요.", 40, { 720, 974 });
-    initializeText(bibimmessage, font, L"고추장을 넣어주세요.", 40, { 720, 974 });
-    initializeText(mixmessage, font, L"[space]로 비벼주세요.", 40, { 720, 974 });
+    initializeText(gamemessage, font, L"화면에 있는 Bibim 재료를 클릭하여 모두 넣어주세요.", 40, { 720, 974 });
+    initializeText(bibimmessage, font, L"고추장을 더블클릭해 넣어주세요.", 40, { 720, 974 });
+    initializeText(mixmessage, font, L"[space]로 게이지가 모두 찰 때까지 비벼주세요.", 40, { 720, 974 });
     timerText.setFont(font);
     timerText.setCharacterSize(50);
     timerText.setFillColor(Color::White);
@@ -174,14 +174,14 @@ int main() {
     mixGauge.setPosition({ 320, 700 }); // 위치 설정
     mixGauge.setFillColor(Color::Red); // 색상 설정
 
-    bool isSauceMoving = false; // 고추장 소스 이동 여부 플래그
-    Vector2f sauceStartPosition; // 고추장 소스 초기 위치
-    Vector2f sauceTargetPosition = bibimbabSprite.getPosition(); // 고추장 소스 목표 위치 (비빔밥 위치)
-    Clock sauceClock; // 고추장 소스 이동 시간 측정용 클럭
-    Scene currentScene = Scene::StartScreen; // 현재 게임 장면
-    bool isTimerRunning = false; // 타이머 동작 여부 플래그
-    Clock clock; // 게임 시간 측정용 클럭
-    Clock transitionClock; // 화면 전환 시간 측정용 클럭
+    bool isSauceMoving = false; // 고추장 소스 이동 여부 플래그 
+    Vector2f sauceStartPosition; // 고추장 소스 초기 위치 
+    Vector2f sauceTargetPosition = bibimbabSprite.getPosition(); // 고추장 소스 목표 위치 (비빔밥 위치) 
+    Clock mixTransitionClock; // MixScreen으로 전환을 위한 추가 클럭
+    Scene currentScene = Scene::StartScreen; // 현재 게임 장면 
+    bool isTimerRunning = false; // 타이머 동작 여부 플래그 
+    Clock clock; // 게임 시간 측정용 클럭 
+    Clock transitionClock; // 화면 전환 시간 측정용 클럭 
 
     while (window.isOpen()) { // 윈도우가 열려있는 동안 반복
         Event event; // 이벤트 객체
@@ -225,27 +225,27 @@ int main() {
                 if (allCollected) currentScene = Scene::BiBimScreen; // 모든 재료 사용 시 비빔밥 화면으로 전환
             }
 
-            // 비빔밥 화면 이벤트 처리: 고추장 클릭
+            // 비빔밥 화면 이벤트 처리: 고추장 클릭 
             if (currentScene == Scene::BiBimScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
-                Vector2i mousePos = Mouse::getPosition(window); // 마우스 위치 가져오기
-                Vector2f mousePosF(mousePos.x, mousePos.y); // 마우스 위치를 Vector2f로 변환
+                // 마우스 클릭 위치 저장 (클릭 순간의 위치만 확인)
+                Vector2f mousePosF(Mouse::getPosition(window));
 
-                if (sauceSprite.getGlobalBounds().contains(mousePosF)) { // 마우스가 고추장 소스 위에 있는 경우
-                    sauceSprite.setPosition(348, 384); // 고추장 소스 위치를 비빔밥 위로 이동
-                    isSauceMoving = true; // 고추장 소스 이동 시작 플래그 설정
-                    sauceClock.restart(); // 고추장 소스 이동 시간 측정 클럭 초기화
+                if (sauceSprite.getGlobalBounds().contains(mousePosF)) { // 마우스가 고추장 소스 위에 있는 경우 
+                    sauceSprite.setPosition(348, 384); // 고추장 소스 위치를 비빔밥 위로 이동 
+                    isSauceMoving = true; // 고추장 소스 이동 시작 플래그 설정 
+                    mixTransitionClock.restart(); // MixScreen 전환용 클럭 초기화
                 }
             }
 
-
-            // 고추장 소스 이동 애니메이션 처리
+            // 고추장 소스 이동 애니메이션 처리 
             if (isSauceMoving) {
-                float elapsedTime = sauceClock.getElapsedTime().asSeconds(); // 고추장 소스 이동 경과 시간 가져오기
-                if (elapsedTime > 0.5f) { // 0.5초 이상 경과했으면
-                    currentScene = Scene::MixScreen; // 믹싱 화면으로 전환
-                    isSauceMoving = false; // 고추장 소스 이동 종료 플래그 해제
+                // 1초가 경과한 경우만 MixScreen으로 전환
+                if (mixTransitionClock.getElapsedTime().asSeconds() >= 1.f) {
+                    currentScene = Scene::MixScreen; // 믹싱 화면으로 전환 
+                    isSauceMoving = false; // 고추장 소스 이동 종료 플래그 해제 
                 }
             }
+
 
             // 게임 로직: 스페이스바를 눌렀을 때 게이지 증가
             if (Keyboard::isKeyPressed(Keyboard::Space)) {
@@ -268,13 +268,14 @@ int main() {
                 isSpacePressed = false;
             }
 
-            // 게임 오버 화면 이벤트 처리: 다시 시도 버튼 클릭
             if (currentScene == Scene::OverScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
-                Vector2i mousePos = Mouse::getPosition(window); // 마우스 위치 가져오기
-                if (retryButtonSprite.getGlobalBounds().contains(Vector2f(mousePos))) { // 마우스가 다시 시도 버튼 위에 있는 경우
+                Vector2i mousePos = Mouse::getPosition(window); // 마우스 위치 가져오기 (윈도우 로컬 좌표)
+                Vector2f worldPos = window.mapPixelToCoords(mousePos); // 로컬 좌표를 월드 좌표로 변환
+                if (retryButtonSprite.getGlobalBounds().contains(worldPos)) { // 마우스가 다시 시도 버튼 위에 있는 경우
                     currentScene = Scene::StartScreen; // 시작 화면으로 전환
                 }
             }
+
         }
 
         // 타이머 동작 처리
