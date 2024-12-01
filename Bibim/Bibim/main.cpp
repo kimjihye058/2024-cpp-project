@@ -13,7 +13,7 @@
 using namespace std; // std 네임스페이스를 현재 네임스페이스에 포함
 using namespace sf; // sf 네임스페이스를 현재 네임스페이스에 포함
 
-enum class Scene { StartScreen, GameScreen, BiBimScreen, MixScreen, EndingScreen, PassScreen, OverScreen }; // 게임의 다양한 장면을 나타내는 열거형
+enum class Scene { StartScreen, GameScreen, BiBimScreen, MixScreen, PassScreen, OverScreen }; // 게임의 다양한 장면을 나타내는 열거형
 
 // 텍스트 객체를 초기화하는 함수. 폰트, 문자열, 크기, 위치를 설정합니다.
 void initializeText(Text& text, const Font& font, const wstring& content, int size, const Vector2f& position) {
@@ -58,7 +58,7 @@ private:
     Vector2f targetPos_; // 재료의 목표 위치 (그릇 안)
 };
 
-
+bool isSpacePressed = false; // 스페이스바 상태를 추적하는 변수
 int mixCount = 0; // 비빔 횟수 변수
 const int MAX_MIX_COUNT = 100; // 비빔의 최대 횟수
 RectangleShape mixGauge, mixGaugeBackground; // 비빔 게이지와 배경 사각형
@@ -150,15 +150,15 @@ int main() {
     // 재료 객체 생성 및 초기화 (Ingredient 클래스 사용)
     vector<unique_ptr<Ingredient>> ingredients;
     map<string, tuple<Texture, Vector2f, Vector2f>> ingredientData = {
-        {"egg", {friedEggTexture, {904, 644}, {521, 404}}},
-        {"cucumber", {cucumberTexture, {1005, 472}, {642, 557}}},
-        {"bean", {beanSproutTexture, {1025, 237}, {723, 472}}},
-        {"mushroom", {mushroomTexture, {831, 99}, {691, 371}}},
-        {"bracken", {brackenTexture, {571, 40}, {513, 325}}},
-        {"meat", {meatTexture, {298, 78}, {396, 387}}},
-        {"carrot", {carrotTexture, {81, 212}, {360, 481}}},
-        {"spinach", {spinachTexture, {72, 452}, {438, 534}}},
-        {"rice", {riceTexture, {166, 665}, {545, 487}}}
+        {"egg", {friedEggTexture, {904, 644}, {521, 394}}},
+        {"cucumber", {cucumberTexture, {1005, 472}, {642, 537}}},
+        {"bean", {beanSproutTexture, {1025, 237}, {723, 452}}},
+        {"mushroom", {mushroomTexture, {831, 99}, {691, 351}}},
+        {"bracken", {brackenTexture, {571, 40}, {513, 305}}},
+        {"meat", {meatTexture, {298, 78}, {396, 367}}},
+        {"carrot", {carrotTexture, {81, 212}, {360, 461}}},
+        {"spinach", {spinachTexture, {72, 452}, {438, 524}}},
+        {"rice", {riceTexture, {166, 665}, {545, 467}}}
     };
 
     for (auto& [name, data] : ingredientData) { // 각 재료 데이터에 대해 반복
@@ -237,6 +237,7 @@ int main() {
                 }
             }
 
+
             // 고추장 소스 이동 애니메이션 처리
             if (isSauceMoving) {
                 float elapsedTime = sauceClock.getElapsedTime().asSeconds(); // 고추장 소스 이동 경과 시간 가져오기
@@ -246,12 +247,25 @@ int main() {
                 }
             }
 
-            // 믹싱 화면 이벤트 처리: 스페이스바 입력
-            if (currentScene == Scene::MixScreen && event.type == Event::KeyPressed && event.key.code == Keyboard::Space) {
-                mixCount++; // 비빔 횟수 증가
-                float gaugeWidth = (mixCount / static_cast<float>(MAX_MIX_COUNT)) * 800; // 비빔 게이지 너비 계산
-                mixGauge.setSize({ gaugeWidth, 30 }); // 비빔 게이지 크기 업데이트
-                if (mixCount >= MAX_MIX_COUNT) currentScene = Scene::EndingScreen; // 최대 비빔 횟수 달성 시 게임 종료 화면으로 전환
+            // 게임 로직: 스페이스바를 눌렀을 때 게이지 증가
+            if (Keyboard::isKeyPressed(Keyboard::Space)) {
+                if (!isSpacePressed) { // 처음 누를 때만 실행
+                    if (mixCount < MAX_MIX_COUNT) {
+                        mixCount++;
+                        float gaugeWidth = static_cast<float>(mixCount) / MAX_MIX_COUNT * 800.0f;
+                        mixGauge.setSize({ gaugeWidth, 30 });
+                    }
+                    if (mixCount >= MAX_MIX_COUNT) { // 믹스 카운트가 최대값에 도달한 경우
+                        isTimerRunning = false; // 타이머 정지
+                        currentScene = Scene::PassScreen; // 패스 화면으로 전환
+                    }
+                    isSpacePressed = true; // 상태를 눌림으로 설정
+                }
+            }
+
+            // 스페이스바가 떼어졌을 때 상태 초기화
+            if (event.type == Event::KeyReleased && event.key.code == Keyboard::Space) {
+                isSpacePressed = false;
             }
 
             // 게임 오버 화면 이벤트 처리: 다시 시도 버튼 클릭
@@ -279,12 +293,6 @@ int main() {
                 stringstream ss; // 문자열 스트림 객체 생성
                 ss << setw(2) << setfill('0') << minutes << ":" << setw(2) << setfill('0') << seconds; // 남은 시간을 "분:초" 형식으로 포맷팅
                 timerText.setString(ss.str()); // 타이머 텍스트 업데이트
-
-                // 게임 종료 화면에서 시간이 남았으면 패스 화면으로 전환
-                if (remainingTime > 0 && currentScene == Scene::EndingScreen) {
-                    isTimerRunning = false; // 타이머 정지
-                    currentScene = Scene::PassScreen; // 패스 화면으로 전환
-                }
             }
         }
 
@@ -322,14 +330,10 @@ int main() {
             window.draw(mixGauge); // 비빔 게이지 사각형 그리기
             break;
 
-        case Scene::EndingScreen: // 게임 종료 화면
-            window.draw(timerText); // 타이머 텍스트 그리기
-            break;
-
         case Scene::PassScreen: // 패스 화면
             window.draw(passBackgroundSprite); // 패스 화면 배경 스프라이트 그리기
             window.draw(timerText); // 타이머 텍스트 그리기
-            timerText.setPosition(600, 187); // 타이머 텍스트 위치 설정
+            timerText.setPosition(600, 20); // 타이머 텍스트 위치 설정
             break;
 
         case Scene::OverScreen: // 게임 오버 화면
