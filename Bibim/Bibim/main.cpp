@@ -175,13 +175,11 @@ int main() {
     mixGauge.setFillColor(Color::Red); // 색상 설정
 
     bool isSauceMoving = false; // 고추장 소스 이동 여부 플래그 
-    Vector2f sauceStartPosition; // 고추장 소스 초기 위치 
     Vector2f sauceTargetPosition = bibimbabSprite.getPosition(); // 고추장 소스 목표 위치 (비빔밥 위치) 
     Clock mixTransitionClock; // MixScreen으로 전환을 위한 추가 클럭
     Scene currentScene = Scene::StartScreen; // 현재 게임 장면 
     bool isTimerRunning = false; // 타이머 동작 여부 플래그 
     Clock clock; // 게임 시간 측정용 클럭 
-    Clock transitionClock; // 화면 전환 시간 측정용 클럭 
 
     while (window.isOpen()) { // 윈도우가 열려있는 동안 반복
         Event event; // 이벤트 객체
