@@ -13,7 +13,7 @@
 using namespace std; // std 네임스페이스를 현재 네임스페이스에 포함
 using namespace sf; // sf 네임스페이스를 현재 네임스페이스에 포함
 
-enum class Scene { StartScreen, GameScreen, BiBimScreen, MixScreen, PassScreen, OverScreen }; // 게임의 다양한 장면을 나타내는 열거형
+enum class Scene { StartScene, IngredientScene, SauceScene, BibimScene, PassScreen, OverScreen }; // 게임의 다양한 장면을 나타내는 열거형
 
 // 텍스트 객체를 초기화하는 함수. 폰트, 문자열, 크기, 위치를 설정합니다.
 void initializeText(Text& text, const Font& font, const wstring& content, int size, const Vector2f& position) {
@@ -176,8 +176,8 @@ int main() {
 
     bool isSauceMoving = false; // 고추장 소스 이동 여부 플래그 
     Vector2f sauceTargetPosition = bibimbabSprite.getPosition(); // 고추장 소스 목표 위치 (비빔밥 위치) 
-    Clock mixTransitionClock; // MixScreen으로 전환을 위한 추가 클럭
-    Scene currentScene = Scene::StartScreen; // 현재 게임 장면 
+    Clock mixTransitionClock; // BibimScene으로 전환을 위한 추가 클럭
+    Scene currentScene = Scene::StartScene; // 현재 게임 장면 
     bool isTimerRunning = false; // 타이머 동작 여부 플래그 
     Clock clock; // 게임 시간 측정용 클럭 
 
@@ -190,11 +190,11 @@ int main() {
             }
 
             // 시작 화면 이벤트 처리: 시작 버튼 클릭
-            if (currentScene == Scene::StartScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+            if (currentScene == Scene::StartScene && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 Vector2i mousePos = Mouse::getPosition(window); // 마우스 위치 가져오기
                 if (startButtonSprite.getGlobalBounds().contains(Vector2f(mousePos))) { // 마우스가 시작 버튼 위에 있는지 확인
                     cout << "버튼이 클릭되었습니다. 게임 화면으로 전환됩니다." << endl; // 메시지 출력
-                    currentScene = Scene::GameScreen; // 게임 화면으로 전환
+                    currentScene = Scene::IngredientScene; // 게임 화면으로 전환
                     isTimerRunning = true; // 타이머 시작
                     clock.restart(); // 타이머 초기화
                     backgroundMusic.play(); // 배경 음악 재생
@@ -202,7 +202,7 @@ int main() {
             }
 
             // 게임 화면 이벤트 처리: 재료 클릭
-            if (currentScene == Scene::GameScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+            if (currentScene == Scene::IngredientScene && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 Vector2i mousePos = Mouse::getPosition(window); // 마우스 위치 가져오기
                 Vector2f mousePosF(mousePos.x, mousePos.y); // 마우스 위치를 Vector2f로 변환
 
@@ -220,26 +220,26 @@ int main() {
                         break;
                     }
                 }
-                if (allCollected) currentScene = Scene::BiBimScreen; // 모든 재료 사용 시 비빔밥 화면으로 전환
+                if (allCollected) currentScene = Scene::SauceScene; // 모든 재료 사용 시 비빔밥 화면으로 전환
             }
 
             // 비빔밥 화면 이벤트 처리: 고추장 클릭 
-            if (currentScene == Scene::BiBimScreen && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+            if (currentScene == Scene::SauceScene && event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 // 마우스 클릭 위치 저장 (클릭 순간의 위치만 확인)
                 Vector2f mousePosF(Mouse::getPosition(window));
 
                 if (sauceSprite.getGlobalBounds().contains(mousePosF)) { // 마우스가 고추장 소스 위에 있는 경우 
                     sauceSprite.setPosition(348, 384); // 고추장 소스 위치를 비빔밥 위로 이동 
                     isSauceMoving = true; // 고추장 소스 이동 시작 플래그 설정 
-                    mixTransitionClock.restart(); // MixScreen 전환용 클럭 초기화
+                    mixTransitionClock.restart(); // BibimScene 전환용 클럭 초기화
                 }
             }
 
             // 고추장 소스 이동 애니메이션 처리 
             if (isSauceMoving) {
-                // 1초가 경과한 경우만 MixScreen으로 전환
+                // 1초가 경과한 경우만 BibimScene으로 전환
                 if (mixTransitionClock.getElapsedTime().asSeconds() >= 1.f) {
-                    currentScene = Scene::MixScreen; // 믹싱 화면으로 전환 
+                    currentScene = Scene::BibimScene; // 믹싱 화면으로 전환 
                     isSauceMoving = false; // 고추장 소스 이동 종료 플래그 해제 
                 }
             }
@@ -270,7 +270,7 @@ int main() {
                 Vector2i mousePos = Mouse::getPosition(window); // 마우스 위치 가져오기 (윈도우 로컬 좌표)
                 Vector2f worldPos = window.mapPixelToCoords(mousePos); // 로컬 좌표를 월드 좌표로 변환
                 if (retryButtonSprite.getGlobalBounds().contains(worldPos)) { // 마우스가 다시 시도 버튼 위에 있는 경우
-                    currentScene = Scene::StartScreen; // 시작 화면으로 전환
+                    currentScene = Scene::StartScene; // 시작 화면으로 전환
                 }
             }
 
@@ -299,12 +299,12 @@ int main() {
         window.clear(); // 화면 지우기
         // 현재 장면에 따라 다른 요소들을 그립니다.
         switch (currentScene) {
-        case Scene::StartScreen: // 시작 화면
+        case Scene::StartScene: // 시작 화면
             window.draw(startBackgroundSprite); // 시작 배경 스프라이트 그리기
             window.draw(startButtonSprite); // 시작 버튼 스프라이트 그리기
             break;
 
-        case Scene::GameScreen: // 게임 화면
+        case Scene::IngredientScene: // 게임 화면
             window.draw(gameBackgroundSprite); // 게임 배경 스프라이트 그리기
             window.draw(timerText); // 타이머 텍스트 그리기
             window.draw(bowlSprite); // 그릇 스프라이트 그리기
@@ -312,7 +312,7 @@ int main() {
             window.draw(gamemessage); // 게임 메시지 텍스트 그리기
             break;
 
-        case Scene::BiBimScreen: // 비빔밥 화면
+        case Scene::SauceScene: // 비빔밥 화면
             window.draw(gameBackgroundSprite); // 게임 배경 스프라이트 그리기
             window.draw(timerText); // 타이머 텍스트 그리기
             window.draw(gochujangSprite); // 고추장 스프라이트 그리기
@@ -321,7 +321,7 @@ int main() {
             window.draw(bibimmessage); // 비빔 메시지 텍스트 그리기
             break;
 
-        case Scene::MixScreen: // 믹싱 화면
+        case Scene::BibimScene: // 믹싱 화면
             window.draw(mixBackgroundSprite); // 믹싱 배경 스프라이트 그리기
             window.draw(timerText); // 타이머 텍스트 그리기
             window.draw(mixmessage); // 믹싱 메시지 텍스트 그리기
